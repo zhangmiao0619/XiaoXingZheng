@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>自定义单双休日历 · 权威法定节假日</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        h1 { font-size: 1.8rem; margin: 0 0 8px; background: linear-gradient(135deg, #2c3e66, #1e4a6b); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .sub { color: #475569; border-left: 3px solid #3b82f6; padding-left: 12px; margin-bottom: 24px; font-size: 0.9rem; }
+        .toolbar {
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 28px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .ctrl-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .ctrl-group label { font-weight: 600; color: #334155; }
+        select, input, button {
+            padding: 8px 14px;
+            border-radius: 40px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.9rem;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background: #2563eb; transform: scale(0.97); }
+        .export-btn { background: #10b981; }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; }
+        .badge { padding: 2px 10px; border-radius: 30px; font-weight: 500; }
+        .double-badge { background: #dbeafe; color: #1e40af; }
+        .single-badge { background: #fee2e2; color: #b91c1c; }
+        .holiday-badge { background: #fef9c3; color: #854d0e; }
+        .workday-badge { background: #e2e8f0; color: #334155; }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+        .month-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #e9eef3;
+            overflow-x: auto;
+        }
+        .month-header {
+            background: #f1f5f9;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .weekdays, .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(44px, 1fr));
+            text-align: center;
+        }
+        .weekdays {
+            background: #fefefe;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .day-cell {
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 0.5px solid #f1f3f7;
+        }
+        .day-number {
+            font-weight: 500;
+            font-size: 0.9rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+            margin-bottom: 4px;
+        }
+        .day-tag {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .tag-double { background: #dbeafe; color: #075985; }
+        .tag-single { background: #ffe4e2; color: #a12a2a; }
+        .tag-holiday { background: #fef3c7; color: #b45309; font-weight: 600; }
+        .tag-work-holiday { background: #fed7aa; color: #7b341e; }
+        @media (max-width: 780px) {
+            .calendar-grid { grid-template-columns: 1fr; }
+            .weekdays, .days-grid { grid-template-columns: repeat(7, minmax(42px, 1fr)); }
+            .day-tag { font-size: 0.55rem; white-space: nowrap; }
+        }
+        .footer-note { margin-top: 32px; font-size: 0.7rem; text-align: center; color: #5b6e8c; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📅 自定义单双休日历 · 权威法定节假日</h1>
+    <div class="sub">根据国务院办公厅发布信息整理</div>
+
+    <div class="toolbar">
+        <div class="ctrl-group">
+            <label>📆 年份</label>
+            <select id="yearSelect"></select>
+        </div>
+        <div class="ctrl-group">
+            <label>📍 起始周任意一天</label>
+            <input type="date" id="startWeekDate" value="2026-04-06">
+        </div>
+        <div class="ctrl-group">
+            <label>🔁 该周类型</label>
+            <select id="startWeekType">
+                <option value="double">双休（周六日全休）</option>
+                <option value="single" selected>单休（仅休一天）</option>
+            </select>
+        </div>
+        <div class="ctrl-group">
+            <label>📌 单休上班日</label>
+            <select id="singleWorkDay">
+                <option value="saturday">周六上班，周日休息</option>
+                <option value="sunday">周日上班，周六休息</option>
+            </select>
+        </div>
+        <div class="ctrl-group">
+            <button id="generateBtn">✨ 生成日历</button>
+            <button id="exportImgBtn" class="export-btn">📸 导出图片</button>
+        </div>
+    </div>
+
+    <div class="legend">
+        <span><span class="badge double-badge">双休</span> 周六日休息</span>
+        <span><span class="badge single-badge">单休上班</span> 按设定上班</span>
+        <span><span class="badge holiday-badge">法定假日</span> 放假</span>
+        <span><span class="badge workday-badge">补班</span> 调休上班</span>
+    </div>
+
+    <div id="monthsGrid" class="calendar-grid">请选择参数并生成</div>
+    <div class="footer-note">✅ 优先级：法定放假 > 补班 > 单双休规则。休息日遇节日显示节日名，补班与单休重叠显示"班"。</div>
+</div>
+
+<script>
+    // ==================== 根据官方信息整理的完整数据 ====================
+    const holidaysData = {
+        // ========== 2024 ==========
+        "2024-01-01": { name: "元旦", type: "holiday" },
+        "2024-02-10": { name: "春节", type: "holiday" }, "2024-02-11": { name: "春节", type: "holiday" }, "2024-02-12": { name: "春节", type: "holiday" }, "2024-02-13": { name: "春节", type: "holiday" }, "2024-02-14": { name: "春节", type: "holiday" }, "2024-02-15": { name: "春节", type: "holiday" }, "2024-02-16": { name: "春节", type: "holiday" }, "2024-02-17": { name: "春节", type: "holiday" },
+        "2024-04-04": { name: "清明", type: "holiday" }, "2024-04-05": { name: "清明", type: "holiday" }, "2024-04-06": { name: "清明", type: "holiday" },
+        "2024-05-01": { name: "劳动节", type: "holiday" }, "2024-05-02": { name: "劳动节", type: "holiday" }, "2024-05-03": { name: "劳动节", type: "holiday" }, "2024-05-04": { name: "劳动节", type: "holiday" }, "2024-05-05": { name: "劳动节", type: "holiday" },
+        "2024-06-10": { name: "端午", type: "holiday" },
+        "2024-09-15": { name: "中秋", type: "holiday" }, "2024-09-16": { name: "中秋", type: "holiday" }, "2024-09-17": { name: "中秋", type: "holiday" },
+        "2024-10-01": { name: "国庆", type: "holiday" }, "2024-10-02": { name: "国庆", type: "holiday" }, "2024-10-03": { name: "国庆", type: "holiday" }, "2024-10-04": { name: "国庆", type: "holiday" }, "2024-10-05": { name: "国庆", type: "holiday" }, "2024-10-06": { name: "国庆", type: "holiday" }, "2024-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2024-02-04": { name: "班", type: "workday" }, "2024-02-18": { name: "班", type: "workday" },
+        "2024-04-07": { name: "班", type: "workday" }, "2024-04-28": { name: "班", type: "workday" }, "2024-05-11": { name: "班", type: "workday" },
+        "2024-09-14": { name: "班", type: "workday" }, "2024-09-29": { name: "班", type: "workday" }, "2024-10-12": { name: "班", type: "workday" },
+
+        // ========== 2025 ==========
+        "2025-01-01": { name: "元旦", type: "holiday" },
+        "2025-01-28": { name: "春节", type: "holiday" }, "2025-01-29": { name: "春节", type: "holiday" }, "2025-01-30": { name: "春节", type: "holiday" }, "2025-01-31": { name: "春节", type: "holiday" }, "2025-02-01": { name: "春节", type: "holiday" }, "2025-02-02": { name: "春节", type: "holiday" }, "2025-02-03": { name: "春节", type: "holiday" }, "2025-02-04": { name: "春节", type: "holiday" },
+        "2025-04-04": { name: "清明", type: "holiday" }, "2025-04-05": { name: "清明", type: "holiday" }, "2025-04-06": { name: "清明", type: "holiday" },
+        "2025-05-01": { name: "劳动节", type: "holiday" }, "2025-05-02": { name: "劳动节", type: "holiday" }, "2025-05-03": { name: "劳动节", type: "holiday" }, "2025-05-04": { name: "劳动节", type: "holiday" }, "2025-05-05": { name: "劳动节", type: "holiday" },
+        "2025-05-31": { name: "端午", type: "holiday" }, "2025-06-01": { name: "端午", type: "holiday" }, "2025-06-02": { name: "端午", type: "holiday" },
+        "2025-10-01": { name: "国庆中秋", type: "holiday" }, "2025-10-02": { name: "国庆中秋", type: "holiday" }, "2025-10-03": { name: "国庆中秋", type: "holiday" }, "2025-10-04": { name: "国庆中秋", type: "holiday" }, "2025-10-05": { name: "国庆中秋", type: "holiday" }, "2025-10-06": { name: "国庆中秋", type: "holiday" }, "2025-10-07": { name: "国庆中秋", type: "holiday" }, "2025-10-08": { name: "国庆中秋", type: "holiday" },
+        // 补班
+        "2025-01-26": { name: "班", type: "workday" }, "2025-02-08": { name: "班", type: "workday" },
+        "2025-04-27": { name: "班", type: "workday" },
+        "2025-09-28": { name: "班", type: "workday" }, "2025-10-11": { name: "班", type: "workday" },
+
+        // ========== 2026 ==========
+        "2026-01-01": { name: "元旦", type: "holiday" }, "2026-01-02": { name: "元旦", type: "holiday" }, "2026-01-03": { name: "元旦", type: "holiday" },
+        "2026-02-15": { name: "春节", type: "holiday" }, "2026-02-16": { name: "春节", type: "holiday" }, "2026-02-17": { name: "春节", type: "holiday" }, "2026-02-18": { name: "春节", type: "holiday" }, "2026-02-19": { name: "春节", type: "holiday" }, "2026-02-20": { name: "春节", type: "holiday" }, "2026-02-21": { name: "春节", type: "holiday" }, "2026-02-22": { name: "春节", type: "holiday" }, "2026-02-23": { name: "春节", type: "holiday" },
+        "2026-04-04": { name: "清明", type: "holiday" }, "2026-04-05": { name: "清明", type: "holiday" }, "2026-04-06": { name: "清明", type: "holiday" },
+        "2026-05-01": { name: "劳动节", type: "holiday" }, "2026-05-02": { name: "劳动节", type: "holiday" }, "2026-05-03": { name: "劳动节", type: "holiday" }, "2026-05-04": { name: "劳动节", type: "holiday" }, "2026-05-05": { name: "劳动节", type: "holiday" },
+        "2026-06-19": { name: "端午", type: "holiday" }, "2026-06-20": { name: "端午", type: "holiday" }, "2026-06-21": { name: "端午", type: "holiday" },
+        "2026-09-25": { name: "中秋", type: "holiday" }, "2026-09-26": { name: "中秋", type: "holiday" }, "2026-09-27": { name: "中秋", type: "holiday" },
+        "2026-10-01": { name: "国庆", type: "holiday" }, "2026-10-02": { name: "国庆", type: "holiday" }, "2026-10-03": { name: "国庆", type: "holiday" }, "2026-10-04": { name: "国庆", type: "holiday" }, "2026-10-05": { name: "国庆", type: "holiday" }, "2026-10-06": { name: "国庆", type: "holiday" }, "2026-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2026-01-04": { name: "班", type: "workday" },
+        "2026-02-14": { name: "班", type: "workday" }, "2026-02-28": { name: "班", type: "workday" },
+        "2026-05-09": { name: "班", type: "workday" },
+        "2026-09-20": { name: "班", type: "workday" }, "2026-10-10": { name: "班", type: "workday" },
+
+        // ========== 2027 ==========
+        "2027-01-01": { name: "元旦", type: "holiday" }, "2027-01-02": { name: "元旦", type: "holiday" }, "2027-01-03": { name: "元旦", type: "holiday" },
+        "2027-02-05": { name: "春节", type: "holiday" }, "2027-02-06": { name: "春节", type: "holiday" }, "2027-02-07": { name: "春节", type: "holiday" }, "2027-02-08": { name: "春节", type: "holiday" }, "2027-02-09": { name: "春节", type: "holiday" }, "2027-02-10": { name: "春节", type: "holiday" }, "2027-02-11": { name: "春节", type: "holiday" },
+        "2027-04-04": { name: "清明", type: "holiday" }, "2027-04-05": { name: "清明", type: "holiday" }, "2027-04-06": { name: "清明", type: "holiday" },
+        "2027-05-01": { name: "劳动节", type: "holiday" }, "2027-05-02": { name: "劳动节", type: "holiday" }, "2027-05-03": { name: "劳动节", type: "holiday" }, "2027-05-04": { name: "劳动节", type: "holiday" }, "2027-05-05": { name: "劳动节", type: "holiday" },
+        "2027-06-13": { name: "端午", type: "holiday" }, "2027-06-14": { name: "端午", type: "holiday" }, "2027-06-15": { name: "端午", type: "holiday" },
+        "2027-09-20": { name: "中秋", type: "holiday" }, "2027-09-21": { name: "中秋", type: "holiday" }, "2027-09-22": { name: "中秋", type: "holiday" },
+        "2027-10-01": { name: "国庆", type: "holiday" }, "2027-10-02": { name: "国庆", type: "holiday" }, "2027-10-03": { name: "国庆", type: "holiday" }, "2027-10-04": { name: "国庆", type: "holiday" }, "2027-10-05": { name: "国庆", type: "holiday" }, "2027-10-06": { name: "国庆", type: "holiday" }, "2027-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2027-02-04": { name: "班", type: "workday" }, "2027-02-12": { name: "班", type: "workday" },
+        "2027-04-30": { name: "班", type: "workday" }, "2027-05-06": { name: "班", type: "workday" },
+        "2027-06-12": { name: "班", type: "workday" },
+        "2027-09-19": { name: "班", type: "workday" },
+        "2027-09-30": { name: "班", type: "workday" }, "2027-10-08": { name: "班", type: "workday" },
+
+        // ========== 2028 ==========
+        "2028-01-01": { name: "元旦", type: "holiday" }, "2028-01-02": { name: "元旦", type: "holiday" }, "2028-01-03": { name: "元旦", type: "holiday" },
+        "2028-01-23": { name: "春节", type: "holiday" }, "2028-01-24": { name: "春节", type: "holiday" }, "2028-01-25": { name: "春节", type: "holiday" }, "2028-01-26": { name: "春节", type: "holiday" }, "2028-01-27": { name: "春节", type: "holiday" }, "2028-01-28": { name: "春节", type: "holiday" }, "2028-01-29": { name: "春节", type: "holiday" }, "2028-01-30": { name: "春节", type: "holiday" },
+        "2028-04-02": { name: "清明", type: "holiday" }, "2028-04-03": { name: "清明", type: "holiday" }, "2028-04-04": { name: "清明", type: "holiday" },
+        "2028-04-29": { name: "劳动节", type: "holiday" }, "2028-04-30": { name: "劳动节", type: "holiday" }, "2028-05-01": { name: "劳动节", type: "holiday" }, "2028-05-02": { name: "劳动节", type: "holiday" }, "2028-05-03": { name: "劳动节", type: "holiday" },
+        "2028-05-28": { name: "端午", type: "holiday" }, "2028-05-29": { name: "端午", type: "holiday" },
+        "2028-09-30": { name: "国庆中秋", type: "holiday" }, "2028-10-01": { name: "国庆中秋", type: "holiday" }, "2028-10-02": { name: "国庆中秋", type: "holiday" }, "2028-10-03": { name: "国庆中秋", type: "holiday" }, "2028-10-04": { name: "国庆中秋", type: "holiday" }, "2028-10-05": { name: "国庆中秋", type: "holiday" }, "2028-10-06": { name: "国庆中秋", type: "holiday" }, "2028-10-07": { name: "国庆中秋", type: "holiday" }, "2028-10-08": { name: "国庆中秋", type: "holiday" },
+        // 补班
+        "2028-01-22": { name: "班", type: "workday" }, "2028-02-05": { name: "班", type: "workday" },
+        "2028-04-01": { name: "班", type: "workday" },
+        "2028-04-28": { name: "班", type: "workday" }, "2028-05-06": { name: "班", type: "workday" },
+        "2028-09-24": { name: "班", type: "workday" }
+    };
+
+    function getHolidayInfo(dateStr) {
+        return holidaysData[dateStr] || null;
+    }
+
+    // 获取某一天的“基础单双休状态”（不考虑节假日）
+    function getBaseWorkStatus(date, startWeekDate, startType, singleWorkDay) {
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) return true;
+
+        const currentDate = new Date(date);
+        const currentDayOfWeek = currentDate.getDay();
+        const monday = new Date(currentDate);
+        const diffToMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+        monday.setDate(currentDate.getDate() - diffToMonday);
+        monday.setHours(0, 0, 0, 0);
+
+        const startBase = new Date(startWeekDate);
+        startBase.setHours(0, 0, 0, 0);
+        const startDayOfWeek = startBase.getDay();
+        const startMonday = new Date(startBase);
+        const startDiff = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+        startMonday.setDate(startBase.getDate() - startDiff);
+        startMonday.setHours(0, 0, 0, 0);
+
+        const weekDiff = Math.round((monday - startMonday) / (7 * 86400000));
+        let isDoubleWeek = (startType === 'double');
+        if (weekDiff % 2 !== 0) isDoubleWeek = !isDoubleWeek;
+
+        if (isDoubleWeek) return false;
+        else {
+            if (singleWorkDay === 'saturday') return dayOfWeek === 6;
+            else return dayOfWeek === 0;
+        }
+    }
+
+    // 获取最终显示状态：法定放假 > 补班 > 基础单双休
+    function getFinalStatus(date, baseWorkStatus, holidayInfo) {
+        if (holidayInfo) {
+            if (holidayInfo.type === 'holiday') {
+                return { work: false, text: holidayInfo.name, cls: 'tag-holiday' };
+            }
+            if (holidayInfo.type === 'workday') {
+                return { work: true, text: '班', cls: 'tag-work-holiday' };
+            }
+        }
+        if (baseWorkStatus) {
+            const dayOfWeek = date.getDay();
+            if (dayOfWeek === 6 || dayOfWeek === 0) {
+                return { work: true, text: '单休上班', cls: 'tag-single' };
+            }
+            return { work: true, text: '工作日', cls: '' };
+        } else {
+            return { work: false, text: '休', cls: 'tag-double' };
+        }
+    }
+
+    function renderCalendar(year, startDateStr, startType, singleWorkDay) {
+        const startBase = new Date(startDateStr);
+        if (isNaN(startBase)) { alert("起始日期无效"); return; }
+
+        const monthsGrid = document.getElementById('monthsGrid');
+        monthsGrid.innerHTML = '';
+
+        for (let m = 1; m <= 12; m++) {
+            const firstDay = new Date(year, m-1, 1);
+            const startWeekday = firstDay.getDay();
+            const daysInMonth = new Date(year, m, 0).getDate();
+
+            const monthCard = document.createElement('div');
+            monthCard.className = 'month-card';
+            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            monthCard.innerHTML = `
+                <div class="month-header">${monthNames[m-1]} ${year}</div>
+                <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+                <div class="days-grid"></div>
+            `;
+            monthsGrid.appendChild(monthCard);
+
+            const daysContainer = monthCard.querySelector('.days-grid');
+            const startOffset = startWeekday === 0 ? 6 : startWeekday - 1;
+            let dayCounter = 1;
+
+            for (let i = 0; i < 42; i++) {
+                if (i < startOffset || dayCounter > daysInMonth) {
+                    const empty = document.createElement('div');
+                    empty.className = 'day-cell';
+                    empty.style.opacity = '0.3';
+                    daysContainer.appendChild(empty);
+                    continue;
+                }
+
+                const curDate = new Date(year, m-1, dayCounter);
+                const dateStr = `${year}-${String(m).padStart(2, '0')}-${String(dayCounter).padStart(2, '0')}`;
+                const holiday = getHolidayInfo(dateStr);
+                const baseWork = getBaseWorkStatus(curDate, startBase, startType, singleWorkDay);
+                const final = getFinalStatus(curDate, baseWork, holiday);
+
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+
+                const numSpan = document.createElement('div');
+                numSpan.className = 'day-number';
+                numSpan.innerText = dayCounter;
+
+                const tagSpan = document.createElement('div');
+                tagSpan.className = `day-tag ${final.cls}`;
+                tagSpan.innerText = final.text;
+
+                cell.appendChild(numSpan);
+                cell.appendChild(tagSpan);
+                daysContainer.appendChild(cell);
+
+                dayCounter++;
+            }
+        }
+    }
+
+    // 初始化年份下拉
+    const yearSelect = document.getElementById('yearSelect');
+    const currentYear = new Date().getFullYear();
+    for (let y = 2024; y <= 2028; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.innerText = y;
+        if (y === currentYear && y >= 2024 && y <= 2028) opt.selected = true;
+        if (y === 2026) opt.selected = true;
+        yearSelect.appendChild(opt);
+    }
+
+    function generate() {
+        const year = parseInt(yearSelect.value);
+        const startDate = document.getElementById('startWeekDate').value;
+        const startType = document.getElementById('startWeekType').value;
+        const singleWorkDay = document.getElementById('singleWorkDay').value;
+        if (!startDate) { alert("请选择起始周日期"); return; }
+        renderCalendar(year, startDate, startType, singleWorkDay);
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generate);
+    document.getElementById('exportImgBtn').addEventListener('click', () => {
+        const grid = document.getElementById('monthsGrid');
+        if (!grid.children.length) { alert("请先生成日历"); return; }
+        html2canvas(grid, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `自定义单双休_${yearSelect.value}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }).catch(() => alert("截图失败"));
+    });
+
+    generate();
+</script>
+</body>
+</html>
