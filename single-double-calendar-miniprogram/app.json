@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "单双休日历",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f0f2f5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

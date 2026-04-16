@@ -1,0 +1,75 @@
+// 2024-2028 年节假日数据
+const holidaysData = {
+  // ========== 2024 ==========
+   "2024-01-01": { name: "元旦", type: "holiday" },
+        "2024-02-10": { name: "春节", type: "holiday" }, "2024-02-11": { name: "春节", type: "holiday" }, "2024-02-12": { name: "春节", type: "holiday" }, "2024-02-13": { name: "春节", type: "holiday" }, "2024-02-14": { name: "春节", type: "holiday" }, "2024-02-15": { name: "春节", type: "holiday" }, "2024-02-16": { name: "春节", type: "holiday" }, "2024-02-17": { name: "春节", type: "holiday" },
+        "2024-04-04": { name: "清明", type: "holiday" }, "2024-04-05": { name: "清明", type: "holiday" }, "2024-04-06": { name: "清明", type: "holiday" },
+        "2024-05-01": { name: "劳动节", type: "holiday" }, "2024-05-02": { name: "劳动节", type: "holiday" }, "2024-05-03": { name: "劳动节", type: "holiday" }, "2024-05-04": { name: "劳动节", type: "holiday" }, "2024-05-05": { name: "劳动节", type: "holiday" },
+        "2024-06-10": { name: "端午", type: "holiday" },
+        "2024-09-15": { name: "中秋", type: "holiday" }, "2024-09-16": { name: "中秋", type: "holiday" }, "2024-09-17": { name: "中秋", type: "holiday" },
+        "2024-10-01": { name: "国庆", type: "holiday" }, "2024-10-02": { name: "国庆", type: "holiday" }, "2024-10-03": { name: "国庆", type: "holiday" }, "2024-10-04": { name: "国庆", type: "holiday" }, "2024-10-05": { name: "国庆", type: "holiday" }, "2024-10-06": { name: "国庆", type: "holiday" }, "2024-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2024-02-04": { name: "补班", type: "workday" }, "2024-02-18": { name: "补班", type: "workday" },
+        "2024-04-07": { name: "补班", type: "workday" }, "2024-04-28": { name: "补班", type: "workday" }, "2024-05-11": { name: "补班", type: "workday" },
+        "2024-09-14": { name: "补班", type: "workday" }, "2024-09-29": { name: "补班", type: "workday" }, "2024-10-12": { name: "补班", type: "workday" },
+
+        // ========== 2025 ==========
+        "2025-01-01": { name: "元旦", type: "holiday" },
+        "2025-01-28": { name: "春节", type: "holiday" }, "2025-01-29": { name: "春节", type: "holiday" }, "2025-01-30": { name: "春节", type: "holiday" }, "2025-01-31": { name: "春节", type: "holiday" }, "2025-02-01": { name: "春节", type: "holiday" }, "2025-02-02": { name: "春节", type: "holiday" }, "2025-02-03": { name: "春节", type: "holiday" }, "2025-02-04": { name: "春节", type: "holiday" },
+        "2025-04-04": { name: "清明", type: "holiday" }, "2025-04-05": { name: "清明", type: "holiday" }, "2025-04-06": { name: "清明", type: "holiday" },
+        "2025-05-01": { name: "劳动节", type: "holiday" }, "2025-05-02": { name: "劳动节", type: "holiday" }, "2025-05-03": { name: "劳动节", type: "holiday" }, "2025-05-04": { name: "劳动节", type: "holiday" }, "2025-05-05": { name: "劳动节", type: "holiday" },
+        "2025-05-31": { name: "端午", type: "holiday" }, "2025-06-01": { name: "端午", type: "holiday" }, "2025-06-02": { name: "端午", type: "holiday" },
+        "2025-10-01": { name: "国庆中秋", type: "holiday" }, "2025-10-02": { name: "国庆中秋", type: "holiday" }, "2025-10-03": { name: "国庆中秋", type: "holiday" }, "2025-10-04": { name: "国庆中秋", type: "holiday" }, "2025-10-05": { name: "国庆中秋", type: "holiday" }, "2025-10-06": { name: "国庆中秋", type: "holiday" }, "2025-10-07": { name: "国庆中秋", type: "holiday" }, "2025-10-08": { name: "国庆中秋", type: "holiday" },
+        // 补班
+        "2025-01-26": { name: "补班", type: "workday" }, "2025-02-08": { name: "补班", type: "workday" },
+        "2025-04-27": { name: "补班", type: "workday" },
+        "2025-09-28": { name: "补班", type: "workday" }, "2025-10-11": { name: "补班", type: "workday" },
+
+        // ========== 2026 ==========
+        "2026-01-01": { name: "元旦", type: "holiday" }, "2026-01-02": { name: "元旦", type: "holiday" }, "2026-01-03": { name: "元旦", type: "holiday" },
+        "2026-02-15": { name: "春节", type: "holiday" }, "2026-02-16": { name: "春节", type: "holiday" }, "2026-02-17": { name: "春节", type: "holiday" }, "2026-02-18": { name: "春节", type: "holiday" }, "2026-02-19": { name: "春节", type: "holiday" }, "2026-02-20": { name: "春节", type: "holiday" }, "2026-02-21": { name: "春节", type: "holiday" }, "2026-02-22": { name: "春节", type: "holiday" }, "2026-02-23": { name: "春节", type: "holiday" },
+        "2026-04-04": { name: "清明", type: "holiday" }, "2026-04-05": { name: "清明", type: "holiday" }, "2026-04-06": { name: "清明", type: "holiday" },
+        "2026-05-01": { name: "劳动节", type: "holiday" }, "2026-05-02": { name: "劳动节", type: "holiday" }, "2026-05-03": { name: "劳动节", type: "holiday" }, "2026-05-04": { name: "劳动节", type: "holiday" }, "2026-05-05": { name: "劳动节", type: "holiday" },
+        "2026-06-19": { name: "端午", type: "holiday" }, "2026-06-20": { name: "端午", type: "holiday" }, "2026-06-21": { name: "端午", type: "holiday" },
+        "2026-09-25": { name: "中秋", type: "holiday" }, "2026-09-26": { name: "中秋", type: "holiday" }, "2026-09-27": { name: "中秋", type: "holiday" },
+        "2026-10-01": { name: "国庆", type: "holiday" }, "2026-10-02": { name: "国庆", type: "holiday" }, "2026-10-03": { name: "国庆", type: "holiday" }, "2026-10-04": { name: "国庆", type: "holiday" }, "2026-10-05": { name: "国庆", type: "holiday" }, "2026-10-06": { name: "国庆", type: "holiday" }, "2026-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2026-01-04": { name: "补班", type: "workday" },
+        "2026-02-14": { name: "补班", type: "workday" }, "2026-02-28": { name: "补班", type: "workday" },
+        "2026-05-09": { name: "补班", type: "workday" },
+        "2026-09-20": { name: "补班", type: "workday" }, "2026-10-10": { name: "补班", type: "workday" },
+
+        // ========== 2027 ==========
+        "2027-01-01": { name: "元旦", type: "holiday" }, "2027-01-02": { name: "元旦", type: "holiday" }, "2027-01-03": { name: "元旦", type: "holiday" },
+        "2027-02-05": { name: "春节", type: "holiday" }, "2027-02-06": { name: "春节", type: "holiday" }, "2027-02-07": { name: "春节", type: "holiday" }, "2027-02-08": { name: "春节", type: "holiday" }, "2027-02-09": { name: "春节", type: "holiday" }, "2027-02-10": { name: "春节", type: "holiday" }, "2027-02-11": { name: "春节", type: "holiday" },
+        "2027-04-04": { name: "清明", type: "holiday" }, "2027-04-05": { name: "清明", type: "holiday" }, "2027-04-06": { name: "清明", type: "holiday" },
+        "2027-05-01": { name: "劳动节", type: "holiday" }, "2027-05-02": { name: "劳动节", type: "holiday" }, "2027-05-03": { name: "劳动节", type: "holiday" }, "2027-05-04": { name: "劳动节", type: "holiday" }, "2027-05-05": { name: "劳动节", type: "holiday" },
+        "2027-06-13": { name: "端午", type: "holiday" }, "2027-06-14": { name: "端午", type: "holiday" }, "2027-06-15": { name: "端午", type: "holiday" },
+        "2027-09-20": { name: "中秋", type: "holiday" }, "2027-09-21": { name: "中秋", type: "holiday" }, "2027-09-22": { name: "中秋", type: "holiday" },
+        "2027-10-01": { name: "国庆", type: "holiday" }, "2027-10-02": { name: "国庆", type: "holiday" }, "2027-10-03": { name: "国庆", type: "holiday" }, "2027-10-04": { name: "国庆", type: "holiday" }, "2027-10-05": { name: "国庆", type: "holiday" }, "2027-10-06": { name: "国庆", type: "holiday" }, "2027-10-07": { name: "国庆", type: "holiday" },
+        // 补班
+        "2027-02-04": { name: "补班", type: "workday" }, "2027-02-12": { name: "补班", type: "workday" },
+        "2027-04-30": { name: "补班", type: "workday" }, "2027-05-06": { name: "补班", type: "workday" },
+        "2027-06-12": { name: "补班", type: "workday" },
+        "2027-09-19": { name: "补班", type: "workday" },
+        "2027-09-30": { name: "补班", type: "workday" }, "2027-10-08": { name: "补班", type: "workday" },
+
+        // ========== 2028 ==========
+        "2028-01-01": { name: "元旦", type: "holiday" }, "2028-01-02": { name: "元旦", type: "holiday" }, "2028-01-03": { name: "元旦", type: "holiday" },
+        "2028-01-23": { name: "春节", type: "holiday" }, "2028-01-24": { name: "春节", type: "holiday" }, "2028-01-25": { name: "春节", type: "holiday" }, "2028-01-26": { name: "春节", type: "holiday" }, "2028-01-27": { name: "春节", type: "holiday" }, "2028-01-28": { name: "春节", type: "holiday" }, "2028-01-29": { name: "春节", type: "holiday" }, "2028-01-30": { name: "春节", type: "holiday" },
+        "2028-04-02": { name: "清明", type: "holiday" }, "2028-04-03": { name: "清明", type: "holiday" }, "2028-04-04": { name: "清明", type: "holiday" },
+        "2028-04-29": { name: "劳动节", type: "holiday" }, "2028-04-30": { name: "劳动节", type: "holiday" }, "2028-05-01": { name: "劳动节", type: "holiday" }, "2028-05-02": { name: "劳动节", type: "holiday" }, "2028-05-03": { name: "劳动节", type: "holiday" },
+        "2028-05-28": { name: "端午", type: "holiday" }, "2028-05-29": { name: "端午", type: "holiday" },
+        "2028-09-30": { name: "国庆中秋", type: "holiday" }, "2028-10-01": { name: "国庆中秋", type: "holiday" }, "2028-10-02": { name: "国庆中秋", type: "holiday" }, "2028-10-03": { name: "国庆中秋", type: "holiday" }, "2028-10-04": { name: "国庆中秋", type: "holiday" }, "2028-10-05": { name: "国庆中秋", type: "holiday" }, "2028-10-06": { name: "国庆中秋", type: "holiday" }, "2028-10-07": { name: "国庆中秋", type: "holiday" }, "2028-10-08": { name: "国庆中秋", type: "holiday" },
+        // 补班
+        "2028-01-22": { name: "补班", type: "workday" }, "2028-02-05": { name: "补班", type: "workday" },
+        "2028-04-01": { name: "补班", type: "workday" },
+        "2028-04-28": { name: "补班", type: "workday" }, "2028-05-06": { name: "补班", type: "workday" },
+        "2028-09-24": { name: "补班", type: "workday" }
+};
+
+function getHolidayInfo(dateStr) {
+  return holidaysData[dateStr] || null;
+}
+
+module.exports = { getHolidayInfo };

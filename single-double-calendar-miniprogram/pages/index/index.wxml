@@ -1,0 +1,95 @@
+<view class="container">
+  <!-- 标题行（独立居中） -->
+  <view class="header">
+    <text class="title">📅 单双休日历</text>
+  </view>
+
+  <!-- 副标题 + 切换按钮行 -->
+  <view class="subtitle-row">
+    <text class="subtitle">自定义起始周 · 法定节假日自动覆盖</text>
+    <view class="view-switch">
+      <button class="switch-btn {{viewMode === 'single' ? 'active' : ''}}" bindtap="switchToSingle">单月</button>
+      <button class="switch-btn {{viewMode === 'year' ? 'active' : ''}}" bindtap="switchToYear">全年</button>
+    </view>
+  </view>
+
+  <!-- 月份选择器（仅单月视图显示） -->
+  <view class="month-nav" wx:if="{{viewMode === 'single'}}">
+    <picker mode="multiSelector" range="{{multiRange}}" value="{{multiValue}}" bindchange="onYearMonthChange">
+      <view class="month-display">{{currentYear}}年{{monthNames[currentMonthIndex]}}</view>
+    </picker>
+  </view>
+
+  <!-- 可折叠设置面板 -->
+  <view class="settings-wrapper">
+    <view class="settings-header" bindtap="toggleSettings">
+      <text class="settings-title">⚙️ 设置选项</text>
+      <text class="settings-arrow">{{showSettings ? '▲' : '▼'}}</text>
+    </view>
+    <view class="settings-content" wx:if="{{showSettings}}">
+      <view class="setting-row">
+        <text class="label">📍 起始周日期</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker">{{startDate}}</view>
+        </picker>
+      </view>
+      <view class="setting-row">
+        <text class="label">🔁 该周类型</text>
+        <radio-group class="radio-group" bindchange="onStartTypeChange">
+          <label class="radio"><radio value="double" checked="{{startType === 'double'}}" /><text>双休</text></label>
+          <label class="radio"><radio value="single" checked="{{startType === 'single'}}" /><text>单休</text></label>
+        </radio-group>
+      </view>
+      <view class="setting-row" wx:if="{{startType === 'single'}}">
+        <text class="label">📌 单休上班日</text>
+        <radio-group class="radio-group" bindchange="onSingleWorkDayChange">
+          <label class="radio"><radio value="saturday" checked="{{singleWorkDay === 'saturday'}}" /><text>周六上班</text></label>
+          <label class="radio"><radio value="sunday" checked="{{singleWorkDay === 'sunday'}}" /><text>周日上班</text></label>
+        </radio-group>
+      </view>
+    </view>
+  </view>
+
+  <!-- 单月滑动视图 -->
+  <swiper wx:if="{{viewMode === 'single'}}" class="calendar-swiper" current="{{swiperCurrent}}" bindchange="onSwiperChange" style="height: {{swiperHeight}}px" duration="300">
+    <swiper-item wx:for="{{monthsData}}" wx:key="index" wx:for-index="idx">
+      <view class="month-card" id="month-card-{{idx}}">
+        <view class="month-header">{{monthsData[idx].name}}</view>
+        <view class="weekdays">
+          <text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text><text>日</text>
+        </view>
+        <view class="days-grid">
+          <view class="day-cell {{day.cls}}" wx:for="{{monthsData[idx].days}}" wx:key="idx2" wx:for-item="day">
+            <block wx:if="{{!day.isEmpty}}">
+              <text class="day-number">{{day.day}}</text>
+              <text class="day-tag">{{day.text}}</text>
+            </block>
+          </view>
+        </view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 全年12个月视图 -->
+  <scroll-view wx:else class="year-view" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="year-grid">
+      <view class="month-card" wx:for="{{monthsData}}" wx:key="index">
+        <view class="month-header">{{item.name}}</view>
+        <view class="weekdays">
+          <text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text><text>日</text>
+        </view>
+        <view class="days-grid">
+          <view class="day-cell {{day.cls}}" wx:for="{{item.days}}" wx:key="idx2" wx:for-item="day">
+            <block wx:if="{{!day.isEmpty}}">
+              <text class="day-number">{{day.day}}</text>
+              <text class="day-tag">{{day.text}}</text>
+            </block>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部提示 -->
+  <view class="auto-save-tip">⚡ 设置自动保存 · {{viewMode === 'single' ? '左右滑动切换月份' : '全年日历一览'}}</view>
+</view>
